@@ -26,11 +26,11 @@ SECRET_KEY = 'django-insecure-2!du^hy&ypo1i(c14$c(4@3$+-b9y25zq)sc=(z^ah2((36cp8
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    'https://7d3a-114-36-66-27.ngrok-free.app//callback', #允許的網域名稱
+    'https://f0bc-114-36-66-27.ngrok-free.app//callback', #允許的網域名稱
     '127.0.0.1',
     'localhost',
-    'https://7d3a-114-36-66-27.ngrok-free.app/',
-    '7d3a-114-36-66-27.ngrok-free.app',
+    'https://f0bc-114-36-66-27.ngrok-free.app/',
+    'f0bc-114-36-66-27.ngrok-free.app',
 ]
 
 
