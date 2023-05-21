@@ -1,5 +1,6 @@
 # iDrinkSpot
 
+https://www.learncodewithmike.com/2020/06/python-line-bot.html
 1. 安裝Python在本地端
 2. 開terminal測試是否安裝成功 >> py --version
 3. 使用pip需更改環境變數  https://dragongo.co/%E8%A7%A3%E6%B1%BA%EF%BC%9A%E7%84%A1%E6%B3%95%E8%BE%A8%E8%AD%98-pip-%E8%A9%9E%E5%BD%99%E6%98%AF%E5%90%A6%E7%82%BA-cmdlet%E3%80%81%E5%87%BD%E6%95%B8%E3%80%81%E6%8C%87%E4%BB%A4%E6%AA%94%E6%88%96/
@@ -27,4 +28,7 @@ LINE_CHANNEL_SECRET = 'Basic settings的Channel Secret'
 11. 在ngrok.exe 輸入官網提供的command line >> ngrok config add-authtoken 2Q5lhBX3aUR4QqfpkW3zUMmNKSz_2orpE2WGrBBTrc95xVNNa
 12. 接著，就可以透過Ngrok，將本機的埠號對外公開，以本文為例，Django在本機運行的埠號為8000，所以輸入以下的指令：ngrok http 8000
 
+13. line developer Webhook URL >>https://7d3a-114-36-66-27.ngrok-free.app/foodlinebot/callback
 
+~~~到這邊目前完成一個echo line bot (py manage.py runserver 8000要執行linebot才能用)~~~
+~~~但是網頁目前還是Page not found (404)~~~
