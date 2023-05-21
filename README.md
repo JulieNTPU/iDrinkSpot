@@ -30,8 +30,8 @@ LINE_CHANNEL_SECRET = 'Basic settings的Channel Secret'
 
 13. line developer Webhook URL >>https://7d3a-114-36-66-27.ngrok-free.app/foodlinebot/callback
 
-# 到這邊目前完成一個echo line bot (py manage.py runserver 8000 & ngrok 要執行，linebot才能用)
-# 但是網頁目前還是Page not found (404)
+- 到這邊目前完成一個echo line bot (py manage.py runserver 8000 & ngrok 要執行，linebot才能用)
+- 但是網頁目前還是Page not found (404)
 
 # [Python+LINE Bot教學]建構具網頁爬蟲功能的LINE Bot機器人
 https://www.learncodewithmike.com/2020/07/python-web-scraping-line-bot.html
