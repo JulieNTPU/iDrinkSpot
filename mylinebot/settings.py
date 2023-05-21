@@ -29,7 +29,8 @@ ALLOWED_HOSTS = [
     'https://7d3a-114-36-66-27.ngrok-free.app//callback', #允許的網域名稱
     '127.0.0.1',
     'localhost',
-    #'https://7d3a-114-36-66-27.ngrok-free.app/'
+    'https://7d3a-114-36-66-27.ngrok-free.app/',
+    '7d3a-114-36-66-27.ngrok-free.app',
 ]
 
 
@@ -43,7 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     
-    'foodlinebot' #APP名稱
+    'foodlinebot.apps.FoodlinebotConfig' #APP名稱
 ]
 
 MIDDLEWARE = [

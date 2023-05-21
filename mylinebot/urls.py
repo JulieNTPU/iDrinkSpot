@@ -16,24 +16,11 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from foodlinebot import views
 
-
-urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('callback', views.callback),
-    # path('foodlinebot/', include('foodlinebot.urls')) #包含應用程式的網址
-    path('https://7d3a-114-36-66-27.ngrok-free.app//callback', admin.site.urls) #包含應用程式的網址
-    
-]
-
-'''
-urlpatterns = [
-    path('callback', views.callback)
-]
+ 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('foodlinebot/', include('foodlinebot.urls')) #包含應用程式的網址
 ]
-'''
+
 
