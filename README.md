@@ -7,4 +7,15 @@
 4. pip install 需要的套件，見requirments.txt  >> pip install -r requirements.txt
 5. pip list 確認套件都安裝好了 
    (更新pip >>python.exe -m pip install --upgrade pip)
-   
+
+6. 在terminal輸入下列
+django-admin startproject mylinebot .  #建立Django專案
+python manage.py startapp foodlinebot  #建立Django應用程式
+python manage.py migrate  #執行資料遷移(Migration)
+
+7. 開啟mylinebot專案主程式下的settings.py檔案，增加LINE Developers的兩個憑證設定，來與LINE進行連結
+LINE_CHANNEL_ACCESS_TOKEN = 'Messaging API的Channel access token'
+LINE_CHANNEL_SECRET = 'Basic settings的Channel Secret'
+
+8. 並且，在INSTALL_APPS的地方，加上剛剛所建立的Django應用程式(APP)，
+'foodlinebot.apps.FoodlinebotConfig',
