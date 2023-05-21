@@ -18,4 +18,13 @@ LINE_CHANNEL_ACCESS_TOKEN = 'Messaging API的Channel access token'
 LINE_CHANNEL_SECRET = 'Basic settings的Channel Secret'
 
 8. 並且，在INSTALL_APPS的地方，加上剛剛所建立的Django應用程式(APP)，
-'foodlinebot.apps.FoodlinebotConfig',
+    'foodlinebot.apps.FoodlinebotConfig',
+
+9. https://www.learncodewithmike.com/2020/06/python-line-bot.html
+    跟著 "四、開發LINE Bot應用程式" 的步驟
+
+10. 安裝Ngrok 
+11. 在ngrok.exe 輸入官網提供的command line >> ngrok config add-authtoken 2Q5lhBX3aUR4QqfpkW3zUMmNKSz_2orpE2WGrBBTrc95xVNNa
+12. 接著，就可以透過Ngrok，將本機的埠號對外公開，以本文為例，Django在本機運行的埠號為8000，所以輸入以下的指令：ngrok http 8000
+
+
