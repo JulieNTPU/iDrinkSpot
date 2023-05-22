@@ -25,7 +25,7 @@ def callback(request):
  
         try:
             events = parser.parse(body, signature)  # 傳入的事件
-            print(events) #印出事件 爬蟲part
+            print("111 ", events) #印出事件 爬蟲part
         except InvalidSignatureError:
             return HttpResponseForbidden()
         except LineBotApiError:
@@ -36,10 +36,10 @@ def callback(request):
 
                 food = IFoodie(event.message.text)  #使用者傳入的訊息文字
                 
-                line_bot_api.reply_message(  # 回復傳入的訊息文字
+                line_bot_api.reply_message(  # 回復訊息
                     event.reply_token,
                     #TextSendMessage(text=event.message.text),  # 回應文字訊息 (一次只能有一個textsendmessage)
-                    TextSendMessage(text=food.scrape())  # # 回應前五間最高人氣且營業中的餐廳訊息文字
+                    TextSendMessage(text=food.scrape()) # 回應前五間最高人氣且營業中的餐廳訊息文字
                 )
         return HttpResponse()
     else:
