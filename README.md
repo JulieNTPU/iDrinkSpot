@@ -55,6 +55,11 @@ https://www.learncodewithmike.com/2020/07/python-web-scraping-line-bot.html
 7. 驗證line developer Webhook URL
 
 
+# 建置linebot對話框
+https://www.learncodewithmike.com/2020/07/line-bot-buttons-template-message.html
+
+
+
 
 
 
