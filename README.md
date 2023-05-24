@@ -56,7 +56,11 @@ https://www.learncodewithmike.com/2020/07/python-web-scraping-line-bot.html
 
 
 # 建置linebot對話框
+✓ 使用 ButtonsTemplate 建置 linebot 對話框，最多四個選項按鈕，每個按鈕最多有三個動作
 https://www.learncodewithmike.com/2020/07/line-bot-buttons-template-message.html
+
+✓ 使用 CarouselTemplate 建置 linebot 對話框，最多十個選項按鈕，每個按鈕最多有三個動作
+https://steam.oxxostudio.tw/category/python/example/line-template-message.html#a3
 
 
 
