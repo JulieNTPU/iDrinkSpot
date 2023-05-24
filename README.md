@@ -62,6 +62,11 @@ https://www.learncodewithmike.com/2020/07/line-bot-buttons-template-message.html
 ✓ 使用 CarouselTemplate 建置 linebot 對話框，最多十個選項按鈕，每個按鈕最多有三個動作
 https://steam.oxxostudio.tw/category/python/example/line-template-message.html#a3
 
+# get user location
+1. 使用 def handle_location_message(event) 
+2. 需要加入 handler = WebhookHandler(settings.LINE_CHANNEL_SECRET) 這行。 
+3. 加入 from linebot.models import MessageEvent, TextMessage, TextSendMessage, LocationMessage
+4. 加入 from linebot import WebhookHandler
 
 
 

@@ -3,21 +3,14 @@ from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbid
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
  
-from linebot import LineBotApi, WebhookParser
+from linebot import LineBotApi, WebhookParser, WebhookHandler
 from linebot.exceptions import InvalidSignatureError, LineBotApiError
-from linebot.models import (
-    MessageEvent,
-    TextSendMessage,
-    TemplateSendMessage,
-    ButtonsTemplate,
-    MessageTemplateAction,
-    CarouselTemplate,
-    CarouselColumn,
-    MessageAction,
-    PostbackAction,
-    URIAction
+from linebot.models import (MessageEvent, TextSendMessage, TemplateSendMessage,
+     ButtonsTemplate, MessageTemplateAction, CarouselTemplate, CarouselColumn, MessageAction,
+    PostbackAction, URIAction, LocationMessage, TextComponent, BoxComponent, BubbleContainer, FlexSendMessage,
 )
 
+#from flask import abort
 
 from .scraper import IFoodie
 
@@ -25,19 +18,53 @@ from .scraper import IFoodie
 # 取得settings.py中的LINE Bot憑證來進行Messaging API的驗證
 line_bot_api = LineBotApi(settings.LINE_CHANNEL_ACCESS_TOKEN) 
 parser = WebhookParser(settings.LINE_CHANNEL_SECRET)
- 
- 
+
+
+handler = WebhookHandler(settings.LINE_CHANNEL_SECRET)
+# 處理接收到的訊息事件
+@handler.add(MessageEvent, message=LocationMessage)
+def handle_location_message(event):
+    latitude = event.message.latitude  # 取得緯度
+    longitude = event.message.longitude  # 取得經度
+    address = event.message.address  # 取得地址
+
+    # 建立 Flex Message 的內容
+    bubble = BubbleContainer(
+        body = BoxComponent(
+            layout='vertical',
+            contents =[
+                TextComponent(text=f"緯度: {latitude}"),
+                TextComponent(text=f"經度: {longitude}")
+            ]
+        )
+    )
+    # 建立 Flex Message
+    flex_message = FlexSendMessage(alt_text="經緯度資訊", contents=bubble)
+    # 回覆 Flex Message 給使用者
+    line_bot_api.reply_message(event.reply_token, flex_message)
+
+
+
 @csrf_exempt
 def callback(request):
  
     if request.method == 'POST':
-        signature = request.META['HTTP_X_LINE_SIGNATURE']
-        body = request.body.decode('utf-8')
+        signature = request.META['HTTP_X_LINE_SIGNATURE'] # 傳入的事件
+        body = request.body.decode('utf-8') # 獲取 request 的內容，這邊假設為 JSON 格式
+
+        signatureLo = request.headers['X-Line-Signature'] # 傳入的位置事件
+        bodyLo = request.body.decode('utf-8')
+
  
         try:
             events = parser.parse(body, signature)  # 傳入的事件
-            print("111 ", events) #印出事件 爬蟲part
+            # print("111 ", events) #印出事件 爬蟲part
+
+            location_events = handler.handle(bodyLo, signatureLo)  # 傳入的位置事件
+            print("222: ", location_events) #印出位置事件 爬蟲part
+
         except InvalidSignatureError:
+            # abort(400)
             return HttpResponseForbidden()
         except LineBotApiError:
             return HttpResponseBadRequest()
@@ -94,7 +121,7 @@ def callback(request):
                     )
                 '''
                 
-                #linebot 回傳 CarouselTemplate 一次最多十個
+                #linebot 回傳 CarouselTemplate 最多十個
                 if event.message.text == "哈囉":
                     line_bot_api.reply_message(  # 回復傳入的訊息文字
                         event.reply_token,
@@ -201,6 +228,11 @@ def callback(request):
 
                             )
                         )
+                    )
+                else:
+                    line_bot_api.reply_message(  # 輸入其他文字時，回復傳入的訊息文字
+                        event.reply_token,
+                        TextSendMessage("請說哈囉~")
                     )
 
         return HttpResponse()
