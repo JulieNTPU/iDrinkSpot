@@ -1,4 +1,5 @@
-import json
+import json, requests
+import math
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
 from django.views.decorators.csrf import csrf_exempt
@@ -10,6 +11,8 @@ from linebot.models import (MessageEvent, TextSendMessage, TemplateSendMessage,
      ButtonsTemplate, MessageTemplateAction, CarouselTemplate, CarouselColumn, MessageAction,
     PostbackAction, URIAction, LocationMessage, TextComponent, BoxComponent, BubbleContainer, FlexSendMessage,
 )
+from numpy import var
+
 
 #from flask import abort
 
@@ -22,9 +25,17 @@ parser = WebhookParser(settings.LINE_CHANNEL_SECRET)
 
 
 handler = WebhookHandler(settings.LINE_CHANNEL_SECRET)
-# 處理接收到的訊息事件
+
+'''
+# 處理user傳送的location
 @handler.add(MessageEvent, message=LocationMessage)
 def handle_location_message(event):
+
+    position = "新北市三峽區國慶路150號" # 位置
+    mapResponse = map.newGeocoder().geocode(position)
+    print("666新北市三峽區國慶路150號: ", mapResponse)
+
+
     latitude = event.message.latitude  # 取得緯度
     longitude = event.message.longitude  # 取得經度
     address = event.message.address  # 取得地址
@@ -41,8 +52,16 @@ def handle_location_message(event):
     )
     # 建立 Flex Message
     flex_message = FlexSendMessage(alt_text="經緯度資訊", contents=bubble)
+
     # 回覆 Flex Message 給使用者
-    line_bot_api.reply_message(event.reply_token, flex_message)
+    line_bot_api.reply_message(
+        event.reply_token, 
+        flex_message
+    )
+    '''
+
+
+# 處理地址資訊，地址轉經緯度
 
 
 
@@ -194,11 +213,34 @@ def callback(request):
                     latitude = event.message.latitude
                     longitude = event.message.longitude
                     print("傳入location囉 333: ", latitude," & ", longitude)
+
+                    lat_try = 24.945198700385056
+                    lon_try = 121.3724270516457
+
+                    Lat1 = latitude * math.pi / 180.0
+                    Long1 = longitude * math.pi / 180.0
+                    
+                    dLat = (lat_try - latitude) * math.pi / 180.0
+                    dLong = (lon_try - longitude) * math.pi / 180.0
+
+                    a = math.sin(dLat / 2) * math.sin(dLat / 2) + math.cos(Lat1) * math.cos(lat_try) * math.sin(dLong / 2) * math.sin(dLong / 2)
+                    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+
+                    R = 6371
+                    d = R * c
+                    print("d: ", d)
+
                     line_bot_api.reply_message(
                         event.reply_token,
-                        TextSendMessage(text=f"哈囉你好，你傳送了位置資訊--> {latitude}, {longitude}")
+                        TextSendMessage(text=f"你傳送了位置資訊--> {latitude}, {longitude}")
                     )
-                
+
+                    '''
+                    position = "新北市三峽區國慶路150號" # 位置
+                    mapResponse = maps.newGeocoder().geocode(position)
+
+                    print("666新北市三峽區國慶路150號: ", mapResponse)
+                    '''
         return HttpResponse()
         
     else:

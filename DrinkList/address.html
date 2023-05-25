@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>茶湯會-台北</title>
+  <style>
+    table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+
+    th,
+    td {
+      padding: 8px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>茶湯會-台北</h1>
+  <table>
+
+    <tr>
+      <th>分店名稱</th>
+      <th>地址</th>
+      <th>經度</th>
+      <th>緯度</th>
+      <td id="latitude"></td>
+      <td id="longitude"></td>
+    </tr>
+
+    <tr class="shop">
+      <td>台北伊通店</td>
+      <td>台北市中山區伊通街113號</td>
+      <td id="latitude"></td>
+      <td id="longitude"></td>
+    </tr>
+
+    <td>台北南西三店</td>
+    <td>台北市中山區南京西路15號B1</td>
+    <td id="latitude"></td>
+    <td id="longitude"></td>
+    </tr>
+
+    <tr class="shop">
+      <td>民生東一店</td>
+      <td>台北市中山區民生東路一段48號</td>
+      <td id="latitude"></td>
+      <td id="longitude"></td>
+    </tr>
+
+    <tr class="shop">
+      <td>農安店</td>
+      <td>台北市中山區農安街16-1號</td>
+      <td id="latitude"></td>
+      <td id="longitude"></td>
+    </tr>
+
+    <tr class="shop">
+      <td>遼寧店</td>
+      <td>台北市中山區遼寧街48之3號</td>
+      <td id="latitude"></td>
+      <td id="longitude"></td>
+    </tr>
+
+    <tr class="shop">
+      <td>台北錦州店</td>
+      <td>台北市中山區錦州街250號</td>
+      <td id="latitude"></td>
+      <td id="longitude"></td>
+    </tr>
+
+    <tr class="shop">
+      <td>台北信陽店</td>
+      <td>台北市中正區信陽街26-1號</td>
+      <td id="latitude"></td>
+      <td id="longitude"></td>
+    </tr>
+
+    <tr class="shop">
+      <td>台北八德一店</td>
+      <td>台北市中正區八德路一段82巷9弄19號</td>
+      <td id="latitude"></td>
+      <td id="longitude"></td>
+    </tr>
+
+    <tr class="shop">
+      <td>台北南門店</td>
+      <td>台北市中正區南昌路一段49號</td>
+      <td id="latitude"></td>
+      <td id="longitude"></td>
+    </tr>
+
+    <tr class="shop">
+      <td>台北新光站前店</td>
+      <td>台北市中正區忠孝西路一段66號B1</td>
+      <td id="latitude"></td>
+      <td id="longitude"></td>
+    </tr>
+
+    <tr class="shop">
+      <td>台北公館店</td>
+      <td>台北市中正區羅斯福路三段286巷18號</td>
+      <td id="latitude"></td>
+      <td id="longitude"></td>
+    </tr>
+
+    <tr class="shop">
+      <td>衡陽店</td>
+      <td>台北市中正區衡陽路15號</td>
+      <td id="latitude"></td>
+      <td id="longitude"></td>
+    </tr>
+
+    <tr class="shop">
+      <td>開封店</td>
+      <td>台北市中正區開封街一段17號</td>
+      <td id="latitude"></td>
+      <td id="longitude"></td>
+    </tr>
+
+    <tr class="shop">
+      <td>台北信義世貿店</td>
+      <td>台北市信義區松勤街3號</td>
+      <td id="latitude"></td>
+      <td id="longitude"></td>
+    </tr>
+
+    <tr class="shop">
+      <td>台北松山店</td>
+      <td>台北市信義區松山路531號</td>
+      <td id="latitude"></td>
+      <td id="longitude"></td>
+    </tr>
+
+    <tr class="shop">
+      <td>台北信義A8店</td>
+      <td>台北市信義區松高路12號B1</td>
+      <td id="latitude"></td>
+      <td id="longitude"></td>
+    </tr>
+
+    <tr class="shop">
+      <td>台北永吉店</td>
+      <td>台北市信義區永吉路30巷29號</td>
+      <td id="latitude"></td>
+      <td id="longitude"></td>
+    </tr>
+
+    <tr class="shop">
+      <td>內湖店</td>
+      <td>台北市內湖區內湖路一段425號1樓</td>
+      <td id="latitude"></td>
+      <td id="longitude"></td>
+    </tr>
+
+    <tr class="shop">
+      <td>內湖民權瑞光店</td>
+      <td>台北市內湖區民權東路六段62號</td>
+      <td id="latitude"></td>
+      <td id="longitude"></td>
+    </tr>
+
+    <tr class="shop">
+      <td>內湖江南店</td>
+      <td>台北市內湖區江南街120號</td>
+      <td id="latitude"></td>
+      <td id="longitude"></td>
+    </tr>
+
+    <tr class="shop">
+      <td>石牌東華店</td>
+      <td>台北市北投區東華街一段554號</td>
+      <td id="latitude"></td>
+      <td id="longitude"></td>
+    </tr>
+
+    <tr class="shop">
+      <td>南港展覽館店</td>
+      <td>台北市南港區南港路一段134號</td>
+      <td id="latitude"></td>
+      <td id="longitude"></td>
+    </tr>
+
+    <tr class="shop">
+      <td>台北南港三店</td>
+      <td>台北市南港區南港路三段4號</td>
+      <td id="latitude"></td>
+      <td id="longitude"></td>
+    </tr>
+
+    <tr class="shop">
+      <td>士林中正店</td>
+      <td>台北市士林區中正路235巷36號1樓</td>
+      <td id="latitude"></td>
+      <td id="longitude"></td>
+    </tr>
+
+    <tr class="shop">
+      <td>士林基河店</td>
+      <td>台北市士林區基河路102號</td>
+      <td id="latitude"></td>
+      <td id="longitude"></td>
+    </tr>
+
+    <tr class="shop">
+      <td>士林天母西店</td>
+      <td>台北市士林區天母西路65號</td>
+      <td id="latitude"></td>
+      <td id="longitude"></td>
+    </tr>
+
+    <tr class="shop">
+      <td>芝山福華店</td>
+      <td>台北市士林區福華路164巷8號</td>
+      <td id="latitude"></td>
+      <td id="longitude"></td>
+    </tr>
+
+    <tr class="shop">
+      <td>台北延三店</td>
+      <td>台北市大同區延平北路三段59號</td>
+      <td id="latitude"></td>
+      <td id="longitude"></td>
+    </tr>
+
+    <tr class="shop">
+      <td>信義三店</td>
+      <td>台北市大安區信義路三段198號</td>
+      <td id="latitude"></td>
+      <td id="longitude"></td>
+    </tr>
+
+    <tr class="shop">
+      <td>台北通化店</td>
+      <td>台北市大安區基隆路二段102號</td>
+      <td id="latitude"></td>
+      <td id="longitude"></td>
+    </tr>
+
+    <tr class="shop">
+      <td>台北安居店</td>
+      <td>台北市大安區安居街10號</td>
+      <td id="latitude"></td>
+      <td id="longitude"></td>
+    </tr>
+
+    <tr class="shop">
+      <td>延吉店</td>
+      <td>台北市大安區延吉街153-5號</td>
+      <td id="latitude"></td>
+      <td id="longitude"></td>
+    </tr>
+
+    <tr class="shop">
+      <td>台北延吉店</td>
+      <td>台北市大安區延吉街153-5號1樓(南側)</td>
+      <td id="latitude"></td>
+      <td id="longitude"></td>
+    </tr>
+
+    <tr class="shop">
+      <td>復興南店</td>
+      <td>台北市大安區復興南路一段68號1樓</td>
+      <td id="latitude"></td>
+      <td id="longitude"></td>
+    </tr>
+
+    <tr class="shop">
+      <td>師大店</td>
+      <td>台北市大安區羅斯福路三段171號</td>
+      <td id="latitude"></td>
+      <td id="longitude"></td>
+    </tr>
+
+    <tr class="shop">
+      <td>文山興隆店</td>
+      <td>台北市文山區興隆路三段149號</td>
+      <td id="latitude"></td>
+      <td id="longitude"></td>
+    </tr>
+
+    <tr class="shop">
+      <td>八德三店</td>
+      <td>台北市松山區八德路三段78號</td>
+      <td id="latitude"></td>
+      <td id="longitude"></td>
+    </tr>
+
+    <tr class="shop">
+      <td>台北饒河店</td>
+      <td>台北市松山區八德路四段729號</td>
+      <td id="latitude"></td>
+      <td id="longitude"></td>
+    </tr>
+
+    <tr class="shop">
+      <td>南京東五店</td>
+      <td>台北市松山區南京東路五段123巷15號</td>
+      <td id="latitude"></td>
+      <td id="longitude"></td>
+    </tr>
+
+    <tr class="shop">
+      <td>台北民生東五店</td>
+      <td>台北市松山區民生東路5段197-2號1樓</td>
+      <td id="latitude"></td>
+      <td id="longitude"></td>
+    </tr>
+
+    <tr class="shop">
+      <td>民生東五店</td>
+      <td>台北市松山區民生東路五段197-2號1樓</td>
+      <td id="latitude"></td>
+      <td id="longitude"></td>
+    </tr>
+
+    <tr class="shop">
+      <td>萬華康定店</td>
+      <td>台北市萬華區康定路213號</td>
+      <td id="latitude"></td>
+      <td id="longitude"></td>
+    </tr>
+
+    <tr class="shop">
+      <td>武昌店</td>
+      <td>台北市萬華區武昌街二段3號</td>
+      <td id="latitude"></td>
+      <td id="longitude"></td>
+    </tr>
+
+  </table>
+</body>
+
+</html>
