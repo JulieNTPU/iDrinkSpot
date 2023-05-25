@@ -3,6 +3,46 @@ from abc import ABC, abstractmethod
 import requests
 
 
+# 飲料抽象類別
+class Drink(ABC):
+ 
+    #def __init__(self, area):
+        #self.area = area  # 地區
+ 
+    @abstractmethod
+    def scrape(self):  #抽象方法(abstractmethod)就是共同的介面，未來新增的美食網頁爬蟲，就可以依據各自的邏輯來實作這個介面。
+        pass
+
+# 飲料地圖爬蟲
+class iDrink(Drink):
+    def scrape(self):
+        # 發送 HTTP GET 請求獲取網頁內容
+        url = 'https://julientpu.github.io/test'
+        response = requests.get(url)
+
+        # 解析 HTML 內容
+        soup = BeautifulSoup(response.text, 'html.parser')
+
+        coordinates = [] # 儲存經緯度的 list
+        cards = soup.find_all('tr', {"class": "data"}) # 提取經緯度資料，先讀取所有tr標籤，並且class為data的元素。
+
+        # 找到tr標籤內，包含經緯度資料的元素。分別存入coordinates list中。
+        for card in cards:
+            LAT = card.find('td', {"class": "lat"}).text  
+            LON = card.find('td', {"class": "lon"}).text
+            coordinates.append((float(LAT), float(LON)))
+
+        '''
+        # 逐個讀取經緯度
+        for lat, lon in coordinates:
+            # 在這裡進行經緯度的處理
+            print("緯度:", lat , " / 經度:", lon)
+            # 執行其他處理或操作
+        '''
+
+        return coordinates
+
+'''
 # 美食抽象類別
 class Food(ABC):
  
@@ -13,8 +53,6 @@ class Food(ABC):
     def scrape(self):  #抽象方法(abstractmethod)就是共同的介面，未來新增的美食網頁爬蟲，就可以依據各自的邏輯來實作這個介面。
         pass
 
-
- 
 # 愛食記爬蟲
 class IFoodie(Food):
  
@@ -46,3 +84,4 @@ class IFoodie(Food):
             content += f"{title} \n{stars}顆星 \n{address} \n\n"
  
         return content
+'''    

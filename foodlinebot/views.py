@@ -16,7 +16,8 @@ from numpy import var
 
 #from flask import abort
 
-from .scraper import IFoodie
+# from .scraper import IFoodie
+from .scraper import iDrink
 
 
 # 取得settings.py中的LINE Bot憑證來進行Messaging API的驗證
@@ -27,42 +28,16 @@ parser = WebhookParser(settings.LINE_CHANNEL_SECRET)
 handler = WebhookHandler(settings.LINE_CHANNEL_SECRET)
 
 '''
-# 處理user傳送的location
-@handler.add(MessageEvent, message=LocationMessage)
-def handle_location_message(event):
-
-    position = "新北市三峽區國慶路150號" # 位置
-    mapResponse = map.newGeocoder().geocode(position)
-    print("666新北市三峽區國慶路150號: ", mapResponse)
-
-
-    latitude = event.message.latitude  # 取得緯度
-    longitude = event.message.longitude  # 取得經度
-    address = event.message.address  # 取得地址
-
-    # 建立 Flex Message 的內容
-    bubble = BubbleContainer(
-        body = BoxComponent(
-            layout='vertical',
-            contents =[
-                TextComponent(text=f"緯度: {latitude}"),
-                TextComponent(text=f"經度: {longitude}")
-            ]
-        )
-    )
-    # 建立 Flex Message
-    flex_message = FlexSendMessage(alt_text="經緯度資訊", contents=bubble)
-
-    # 回覆 Flex Message 給使用者
-    line_bot_api.reply_message(
-        event.reply_token, 
-        flex_message
-    )
-    '''
-
-
-# 處理地址資訊，地址轉經緯度
-
+# 建立經緯度列表_test
+coordinates = [
+    (24.943134055011537, 121.3724875281764), #comebuy
+    (24.942855244813064, 121.37269469336194), #milkshop
+    (24.94226154270322, 121.37267765958076), #wootea
+    (24.94378253440997, 121.37416293381938), #coco
+    (24.937186, 121.367094), #truedan
+    (24.942898036215105, 121.37372763003792) #machu
+]
+'''
 
 
 @csrf_exempt
@@ -78,10 +53,8 @@ def callback(request):
         # 逐個處理事件
         signature = request.META['HTTP_X_LINE_SIGNATURE']
         # events = parser.parse(body, signature)  # 傳入的事件
-
         print("event的細節: ", events)
 
-        
         try:
             events = parser.parse(body, signature)  # 傳入的事件
             # print("111 ", events) #印出事件 爬蟲part
@@ -91,7 +64,6 @@ def callback(request):
         except LineBotApiError:
             return HttpResponseBadRequest()
         
-
         for event in events:
             if isinstance(event, MessageEvent):  # 如果有訊息事件
                 print("進入訊息事件")
@@ -123,14 +95,6 @@ def callback(request):
                                     MessageTemplateAction(
                                         label='台中市',
                                         text='台中市'
-                                    ),
-                                    MessageTemplateAction(
-                                        label='高雄市',
-                                        text='高雄市'
-                                    ),
-                                    MessageTemplateAction(
-                                        label='花蓮縣',
-                                        text='花蓮縣'
                                     )
                                 ]
                             )
@@ -205,43 +169,109 @@ def callback(request):
                         event.reply_token,
                         TextSendMessage("請說哈囉~")
                     )
-                                    
-                    
                 
                 # 如果傳入的是位置訊息
                 elif event.message.type == 'location':
-                    latitude = event.message.latitude
-                    longitude = event.message.longitude
-                    print("傳入location囉 333: ", latitude," & ", longitude)
 
-                    lat_try = 24.945198700385056
-                    lon_try = 121.3724270516457
-
-                    Lat1 = latitude * math.pi / 180.0
-                    Long1 = longitude * math.pi / 180.0
-                    
-                    dLat = (lat_try - latitude) * math.pi / 180.0
-                    dLong = (lon_try - longitude) * math.pi / 180.0
-
-                    a = math.sin(dLat / 2) * math.sin(dLat / 2) + math.cos(Lat1) * math.cos(lat_try) * math.sin(dLong / 2) * math.sin(dLong / 2)
-                    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
-
-                    R = 6371
-                    d = R * c
-                    print("d: ", d)
+                    # user的經緯度
+                    user_latitude = event.message.latitude #緯度 24.多
+                    user_longitude = event.message.longitude  #精度 121.多
 
                     line_bot_api.reply_message(
                         event.reply_token,
-                        TextSendMessage(text=f"你傳送了位置資訊--> {latitude}, {longitude}")
+                        TextSendMessage(text=f"你傳送了位置資訊--> {user_latitude}, {user_longitude}")
                     )
 
-                    '''
-                    position = "新北市三峽區國慶路150號" # 位置
-                    mapResponse = maps.newGeocoder().geocode(position)
+                    drinkShop = iDrink() #可得到爬蟲經緯度的結果。資料型態是coordinates。程式在scraper.py
+                    # print("drinkShop ", drinkShop.scrape(), "\n user_latitude: ", user_latitude, " user_longitude: ", user_longitude) #檢查drinkShop是否有得到web的經緯度                   
+                    for ll, nn in drinkShop.scrape():
+                        lat_try = ll
+                        lon_try = nn
+                        print("d: ", haversine(user_latitude, user_longitude, lat_try, lon_try))
+                    
+                   
 
-                    print("666新北市三峽區國慶路150號: ", mapResponse)
-                    '''
         return HttpResponse()
         
     else:
         return HttpResponseBadRequest()
+    
+# 計算兩點間的距離
+def haversine(lat1, long1, lat2, long2):
+    R = 6371  # 地球半徑(公里)
+    def rad(x):
+        return x * math.pi / 180
+
+    dLat = rad(lat2 - lat1)
+    dLong = rad(long2 - long1)
+
+    a = math.sin(dLat / 2) * math.sin(dLat / 2) + \
+        math.cos(rad(lat1)) * math.cos(rad(lat2)) * \
+        math.sin(dLong / 2) * math.sin(dLong / 2)
+
+    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+
+    d = R * c
+
+    return d
+
+
+
+
+'''
+# 取得距離前五名短的店家
+def get_rank_list(latitude, longitude, skip):
+    json = _cacheService.get_json()
+    dataList = json['features']
+    rankList = sorted([
+        {
+            'rank': haversine(
+                float(it['geometry']['coordinates'][1]),
+                float(it['geometry']['coordinates'][0]),
+                float(latitude),
+                float(longitude)
+            ),
+            'data': it
+        }
+        for it in dataList
+    ], key=lambda x: x['rank'])[skip:skip+5]
+    
+    rankList = [it['data'] for it in rankList]
+    return rankList
+'''
+
+
+
+'''
+# 處理user傳送的location
+@handler.add(MessageEvent, message=LocationMessage)
+def handle_location_message(event):
+
+    position = "新北市三峽區國慶路150號" # 位置
+    mapResponse = map.newGeocoder().geocode(position)
+    print("666新北市三峽區國慶路150號: ", mapResponse)
+
+
+    latitude = event.message.latitude  # 取得緯度
+    longitude = event.message.longitude  # 取得經度
+    address = event.message.address  # 取得地址
+
+    # 建立 Flex Message 的內容
+    bubble = BubbleContainer(
+        body = BoxComponent(
+            layout='vertical',
+            contents =[
+                TextComponent(text=f"緯度: {latitude}"),
+                TextComponent(text=f"經度: {longitude}")
+            ]
+        )
+    )
+    # 建立 Flex Message
+    flex_message = FlexSendMessage(alt_text="經緯度資訊", contents=bubble)
+
+    # 回覆 Flex Message 給使用者
+    line_bot_api.reply_message(
+        event.reply_token, 
+        flex_message
+    )
+    '''
