@@ -69,6 +69,10 @@ https://steam.oxxostudio.tw/category/python/example/line-template-message.html#a
 4. 加入 from linebot import WebhookHandler
 5. 使用 event.message.type 來判斷傳入的訊息為 文字 or 位置
 
+# 爬蟲
+1. 使用 drinkShop.scrape() 爬飲料店分店的經緯度資料
+2. 用 haversine() function 計算使用者與飲料店分店的距離
+
 
 
 

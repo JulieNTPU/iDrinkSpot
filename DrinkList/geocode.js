@@ -1,3 +1,5 @@
+//沒有做用
+
 function doPost(e) {
     //認證身份，重新輸入line@ access_token
     var CHANNEL_ACCESS_TOKEN = 'BH9fBAs/qirZVdcPCcQQ/rvCdq3Nwg0wUdJvQmcRux84p1Vk10IwqdehHGWTTPZFnupvwhDmQd8rg0+GolEx0305sEmU57tUZGF4J/7nFXxdK1KbT9zB8H8An5cNy03celRzKUWjI1yRMwtfOnZjnQdB04t89/1O/w1cDnyilFU=';//這邊要改成你的 CHANNEL_ACCESS_TOKEN

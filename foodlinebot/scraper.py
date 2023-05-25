@@ -17,7 +17,7 @@ class Drink(ABC):
 class iDrink(Drink):
     def scrape(self):
         # 發送 HTTP GET 請求獲取網頁內容
-        url = 'https://julientpu.github.io/test'
+        url = 'https://julientpu.github.io/茶湯會'
         response = requests.get(url)
 
         # 解析 HTML 內容
