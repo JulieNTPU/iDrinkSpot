@@ -167,7 +167,7 @@ def callback(request):
                     else:
                         line_bot_api.reply_message(  # 輸入其他文字時，回復傳入的訊息文字
                         event.reply_token,
-                        TextSendMessage("請說哈囉~")
+                        TextSendMessage("馬上使用 iDrinkSpot吧!!! \n請傳送位置資訊~~~")
                     )
                 
                 # 如果傳入的是位置訊息
