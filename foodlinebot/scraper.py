@@ -1,7 +1,20 @@
 from bs4 import BeautifulSoup
 from abc import ABC, abstractmethod
 import requests
+import soupsieve
 
+
+shop_names = []
+shop_names.append("麻古茶坊")
+shop_names.append("coco都可")
+shop_names.append("五桐號WooTEA")
+shop_names.append("珍煮丹")
+shop_names.append("迷客夏")
+shop_names.append("可不可熟成紅茶")
+print("111113:", shop_names)
+
+# 發送 HTTP GET 請求獲取網頁內容
+url = 'https://julientpu.github.io/coco都可-分店'
 
 # 飲料抽象類別
 class Drink(ABC):
@@ -15,12 +28,11 @@ class Drink(ABC):
 
 # 飲料地圖爬蟲
 class iDrink(Drink):
-    def scrape(self):
-        # 發送 HTTP GET 請求獲取網頁內容
-        url = 'https://julientpu.github.io/茶湯會'
-        response = requests.get(url)
+    
+    def scrape(self): # 取得經緯度
 
-        # 解析 HTML 內容
+        # 解析HTML內容
+        response = requests.get(url)        
         soup = BeautifulSoup(response.text, 'html.parser')
 
         coordinates = [] # 儲存經緯度的 list
@@ -28,19 +40,24 @@ class iDrink(Drink):
 
         # 找到tr標籤內，包含經緯度資料的元素。分別存入coordinates list中。
         for card in cards:
+            BRANCH_SHOP = card.find('td', {"class": "shop"}).getText()
             LAT = card.find('td', {"class": "lat"}).text  
             LON = card.find('td', {"class": "lon"}).text
-            coordinates.append((float(LAT), float(LON)))
-
-        '''
-        # 逐個讀取經緯度
-        for lat, lon in coordinates:
-            # 在這裡進行經緯度的處理
-            print("緯度:", lat , " / 經度:", lon)
-            # 執行其他處理或操作
-        '''
-
+            coordinates.append((BRANCH_SHOP, float(LAT), float(LON)))
         return coordinates
+    
+    def get_shop_names(): # 取得店名
+
+        # 解析HTML內容
+        response = requests.get(url)
+        soup = BeautifulSoup(response.text, 'html.parser')
+
+        # 讀取html分店名稱
+        DrinkShops = soup.find_all('body', {"class": "body"})
+        for DrinkShop in DrinkShops:
+            DrinkShopName = DrinkShop.find('h1', {"class": "ShopName"}).text
+            print("飲料店名稱:", DrinkShopName)
+        return DrinkShopName
 
 '''
 # 美食抽象類別

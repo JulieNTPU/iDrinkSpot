@@ -53,7 +53,7 @@ def callback(request):
         # 逐個處理事件
         signature = request.META['HTTP_X_LINE_SIGNATURE']
         # events = parser.parse(body, signature)  # 傳入的事件
-        print("event的細節: ", events)
+        # print("event的細節: ", events)
 
         try:
             events = parser.parse(body, signature)  # 傳入的事件
@@ -176,26 +176,46 @@ def callback(request):
                     # user的經緯度
                     user_latitude = event.message.latitude #緯度 24.多
                     user_longitude = event.message.longitude  #精度 121.多
-
+                    
+                    '''
                     line_bot_api.reply_message(
                         event.reply_token,
                         TextSendMessage(text=f"你傳送了位置資訊--> {user_latitude}, {user_longitude}")
                     )
+                    '''
+                    shop_names = iDrink.get_shop_names() #可得到店名的結果。資料型態是list。
 
                     drinkShop = iDrink() #可得到爬蟲經緯度的結果。資料型態是coordinates。程式在scraper.py
                     # print("drinkShop ", drinkShop.scrape(), "\n user_latitude: ", user_latitude, " user_longitude: ", user_longitude) #檢查drinkShop是否有得到web的經緯度                   
-                    for ll, nn in drinkShop.scrape():
+                    distance = []
+                    for shop, ll, nn in drinkShop.scrape():
+                        shopname=shop
                         lat_try = ll
                         lon_try = nn
-                        print("d: ", haversine(user_latitude, user_longitude, lat_try, lon_try))
-                    
-                   
 
+                        # 計算所有距離，存入distance[]
+                        distance.append((haversine(user_latitude, user_longitude, lat_try, lon_try), shopname))
+                        #print("d: ", haversine(user_latitude, user_longitude, lat_try, lon_try), "shop name: ", shopname) #檢查haversine是否有得到距離
+                       
+                    distance.sort() #距離由小到大排序
+                    
+                    #查看前五筆距離短的資料，如果距離小於1公里，就回傳。如果有回傳一筆就跳出回圈。
+                    for i in range (0, 5):
+                        if distance[i][0] < 1:
+                            print("店名: ", distance[i][1], "距離: ", distance[i][0])
+                            line_bot_api.reply_message(
+                                event.reply_token,
+                                TextSendMessage(text=f"分店名: {distance[i][1]}, \n距離: {distance[i][0]}, \n店名: {shop_names}")
+                            )
+                        break
+                        
         return HttpResponse()
         
     else:
         return HttpResponseBadRequest()
     
+
+
 # 計算兩點間的距離
 def haversine(lat1, long1, lat2, long2):
     R = 6371  # 地球半徑(公里)
@@ -214,64 +234,3 @@ def haversine(lat1, long1, lat2, long2):
     d = R * c
 
     return d
-
-
-
-
-'''
-# 取得距離前五名短的店家
-def get_rank_list(latitude, longitude, skip):
-    json = _cacheService.get_json()
-    dataList = json['features']
-    rankList = sorted([
-        {
-            'rank': haversine(
-                float(it['geometry']['coordinates'][1]),
-                float(it['geometry']['coordinates'][0]),
-                float(latitude),
-                float(longitude)
-            ),
-            'data': it
-        }
-        for it in dataList
-    ], key=lambda x: x['rank'])[skip:skip+5]
-    
-    rankList = [it['data'] for it in rankList]
-    return rankList
-'''
-
-
-
-'''
-# 處理user傳送的location
-@handler.add(MessageEvent, message=LocationMessage)
-def handle_location_message(event):
-
-    position = "新北市三峽區國慶路150號" # 位置
-    mapResponse = map.newGeocoder().geocode(position)
-    print("666新北市三峽區國慶路150號: ", mapResponse)
-
-
-    latitude = event.message.latitude  # 取得緯度
-    longitude = event.message.longitude  # 取得經度
-    address = event.message.address  # 取得地址
-
-    # 建立 Flex Message 的內容
-    bubble = BubbleContainer(
-        body = BoxComponent(
-            layout='vertical',
-            contents =[
-                TextComponent(text=f"緯度: {latitude}"),
-                TextComponent(text=f"經度: {longitude}")
-            ]
-        )
-    )
-    # 建立 Flex Message
-    flex_message = FlexSendMessage(alt_text="經緯度資訊", contents=bubble)
-
-    # 回覆 Flex Message 給使用者
-    line_bot_api.reply_message(
-        event.reply_token, 
-        flex_message
-    )
-    '''
