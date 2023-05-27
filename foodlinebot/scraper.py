@@ -3,18 +3,9 @@ from abc import ABC, abstractmethod
 import requests
 
 
-shop_names = []
-shop_names.append("麻古茶坊")
-shop_names.append("coco都可")
-shop_names.append("五桐號WooTEA")
-shop_names.append("珍煮丹")
-shop_names.append("迷客夏")
-shop_names.append("可不可熟成紅茶")
-print("111113:", shop_names)
-
 # 發送 HTTP GET 請求獲取網頁內容
 # url = 'https://julientpu.github.io/coco都可-分店'
-url = 'https://jiatongoo.github.io/alldrinks.html'
+url_allshop = 'https://jiatongoo.github.io/alldrinks.html'
 
 # 飲料抽象類別
 class Drink(ABC):
@@ -32,7 +23,7 @@ class iDrink(Drink):
     def scrape(self): # 取得經緯度
 
         # 解析HTML內容
-        response = requests.get(url)        
+        response = requests.get(url_allshop)        
         soup = BeautifulSoup(response.text, 'html.parser')
 
         coordinates = [] # 儲存經緯度的 list
@@ -42,24 +33,14 @@ class iDrink(Drink):
         for card in cards:
             SHOP = card.find('td', {"class": "ShopName"}).getText() #店名
             BRANCH_SHOP = card.find('td', {"class": "shop"}).getText() #分店
+            Addr = card.find('td', {"class": "address"}).getText() #地址
             LAT = card.find('td', {"class": "lat"}).text  
             LON = card.find('td', {"class": "lon"}).text
 
-            coordinates.append((SHOP, BRANCH_SHOP, float(LAT), float(LON)))
+            coordinates.append((SHOP, BRANCH_SHOP, Addr, float(LAT), float(LON)))
         return coordinates
     
-    def get_shop_names(): # 取得店名
-
-        # 解析HTML內容
-        response = requests.get(url)
-        soup = BeautifulSoup(response.text, 'html.parser')
-
-        # 讀取html分店名稱
-        DrinkShops = soup.find_all('body', {"class": "body"})
-        for DrinkShop in DrinkShops:
-            DrinkShopName = DrinkShop.find('h1', {"class": "ShopName"}).text
-            print("飲料店名稱:", DrinkShopName)
-        return DrinkShopName
+ 
 
 '''
 # 美食抽象類別

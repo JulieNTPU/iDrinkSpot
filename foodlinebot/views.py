@@ -1,5 +1,6 @@
 import json, requests
 import math
+import urllib.parse
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
 from django.views.decorators.csrf import csrf_exempt
@@ -19,8 +20,11 @@ from .scraper import iDrink
 # 取得settings.py中的LINE Bot憑證來進行Messaging API的驗證
 line_bot_api = LineBotApi(settings.LINE_CHANNEL_ACCESS_TOKEN) 
 parser = WebhookParser(settings.LINE_CHANNEL_SECRET)
-
 handler = WebhookHandler(settings.LINE_CHANNEL_SECRET)
+
+
+drinkShop_options = [] # 存距離短的`店名`的list
+
 
 
 @csrf_exempt
@@ -49,59 +53,157 @@ def callback(request):
         
         for event in events:
             if isinstance(event, MessageEvent):  # 如果有訊息事件
-                print("進入訊息事件")
+                print("進入訊息事件")                        
 
-                '''
-                #linebot 只回傳文字
-                food = IFoodie(event.message.text)  #使用者傳入的訊息文字
-                line_bot_api.reply_message(  # 回復訊息
-                    event.reply_token,
-                    #TextSendMessage(text=event.message.text),  # 回應文字訊息 (一次只能有一個textsendmessage)
-                    TextSendMessage(text=food.scrape()) # 回應前五間最高人氣且營業中的餐廳訊息文字
-                )
-                '''
-                '''
-                #linebot 回傳按鈕，最多四個
-                if event.message.text == "哈囉":
-                     line_bot_api.reply_message(  # 回復傳入的訊息文字
-                        event.reply_token,
-                        TemplateSendMessage(
-                            alt_text='Buttons template',
-                            template=ButtonsTemplate(
-                                title='Menu',
-                                text='請選擇地區',
-                                actions=[
-                                    MessageTemplateAction(
-                                        label='台北市',
-                                        text='台北市'
-                                    ),
-                                    MessageTemplateAction(
-                                        label='台中市',
-                                        text='台中市'
-                                    )
-                                ]
-                            )
-                        )
-                    )
-                else:
-                    food = IFoodie(event.message.text)
- 
-                    line_bot_api.reply_message(  # 回應前五間最高人氣且營業中的餐廳訊息文字
-                        event.reply_token,
-                        TextSendMessage(text=food.scrape())
-                    )
-                '''
                 # 如果傳入的是文字訊息
                 if event.message.type == 'text':
                     text = event.message.text
+                    
+                    print("5555555 :", drinkShop_options)
+
                     if text == "我想喝飲料❗❗❗":
                         line_bot_api.reply_message(
                             event.reply_token,
                             TextSendMessage(text="歡迎使用iDrinkSpot!!! \n請傳送位置資訊~~~")
                         )
+                    else:
+                        line_bot_api.reply_message(  # 輸入其他文字時，回復傳入的訊息文字
+                        event.reply_token,
+                        TextSendMessage("馬上使用 iDrinkSpot 吧!!! \n請傳送位置資訊~~~")
+                    )
+                
+                # 如果傳入的是位置訊息
+                elif event.message.type == 'location':
+
+                    # user的經緯度
+                    user_latitude = event.message.latitude #緯度 24.多
+                    user_longitude = event.message.longitude  #精度 121.多
                     
-                    elif text == "哈囉":
-                        line_bot_api.reply_message(  #linebot 回傳 CarouselTemplate 最多十個
+
+                    drinkShop = iDrink() #可得到爬蟲經緯度的結果。資料型態是coordinates。程式在scraper.py
+                    # print("drinkShop ", drinkShop.scrape(), "\n user_latitude: ", user_latitude, " user_longitude: ", user_longitude) #檢查drinkShop是否有得到web的經緯度                   
+                    
+                    distance = [] #存所有距離的list
+                    drinkShop_options.clear() # 重新存data
+
+                    for shopname, branchshop, addr, ll, nn in drinkShop.scrape():
+                        ShopName = shopname
+                        BRANCH_SHOP = branchshop
+                        address = addr
+                        lat_try = ll
+                        lon_try = nn
+
+                        # 計算所有距離，存入distance[]
+                        distance.append((haversine(user_latitude, user_longitude, lat_try, lon_try), BRANCH_SHOP, ShopName, address))
+                        #print("d: ", haversine(user_latitude, user_longitude, lat_try, lon_try), "shop name: ", shopname) #檢查haversine是否有得到距離
+                       
+                    distance.sort() #距離由小到大排序
+                                        
+                    #查看前8筆距離短的資料，如果距離小於1公里，就回傳。如果有回傳一筆就跳出回圈。
+                    for i in range (0, 5):
+                        if distance[i][0] < 1:
+                            #print("店名: ", distance[i][2], " / 分店: ", distance[i][1], " / 距離: ", distance[i][0], " / 地址: ", distance[i][3])
+                            
+                            google_maps_link = generate_google_maps_link(distance[i][3])
+                            #print("google_maps_link: ",google_maps_link)
+                            
+                            drinkShop_options.append({
+                                'ShopName': distance[i][2],
+                                'BRANCH_SHOP': distance[i][1],
+                                'url': google_maps_link
+                                }
+                            )
+
+                        else:
+                            print("Sorry~ 方圓一公里內沒有飲料店喔")
+                            line_bot_api.reply_message(
+                                event.reply_token,
+                                TextSendMessage(text= "Sorry~ 方圓一公里內沒有飲料店喔")
+                            )
+                            break
+                            
+                    print("drinkShop_options: ", drinkShop_options)
+                    menu = send_menu()
+                    
+                    # 发送回复消息
+                    line_bot_api.reply_message(
+                        event.reply_token,
+                        menu
+                    )
+                    
+                            
+                        
+                        
+        return HttpResponse()
+        
+    else:
+        return HttpResponseBadRequest()
+    
+
+def send_menu():
+    columns=[]
+    for option in drinkShop_options:
+        column = CarouselColumn(
+            title = option['ShopName'],
+            text = option['BRANCH_SHOP'],
+            actions = [
+                MessageAction(
+                label = '點我看菜單',
+                text = '點我看菜單'
+                ),
+                URIAction(
+                    label = 'Google Map',
+                    uri = option['url']
+                )
+            ]
+        )
+        columns.append(column)
+        # 创建 CarouselTemplate，并指定 columns 参数为上述列表
+        carousel_template = CarouselTemplate(columns=columns)
+                        
+        # 使用上述 CarouselTemplate 创建 TemplateSendMessage
+        template_message = TemplateSendMessage(
+            alt_text='CarouselTemplate',
+            template=carousel_template
+        )
+    return template_message
+
+        
+
+
+
+
+
+
+# 輸入地址產生Google Maps連結
+def generate_google_maps_link(address):
+    base_url = 'https://www.google.com/maps/search/?api=1'
+    encoded_address = urllib.parse.quote(address)
+    return f'{base_url}&query={encoded_address}'
+
+
+# 計算兩點間的距離
+def haversine(lat1, long1, lat2, long2):
+    R = 6371  # 地球半徑(公里)
+    def rad(x):
+        return x * math.pi / 180
+
+    dLat = rad(lat2 - lat1)
+    dLong = rad(long2 - long1)
+
+    a = math.sin(dLat / 2) * math.sin(dLat / 2) + \
+        math.cos(rad(lat1)) * math.cos(rad(lat2)) * \
+        math.sin(dLong / 2) * math.sin(dLong / 2)
+
+    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+
+    d = R * c
+
+    return d
+
+
+''' 滑軌選單模板
+line_bot_api.reply_message(  #linebot 回傳 CarouselTemplate 最多十個
                             event.reply_token,
                             TemplateSendMessage(    
                                 alt_text='CarouselTemplate',
@@ -147,80 +249,31 @@ def callback(request):
                                 )
                             )
                         )
-                    else:
-                        line_bot_api.reply_message(  # 輸入其他文字時，回復傳入的訊息文字
+'''
+
+
+''' 四個選擇 模板
+                #linebot 回傳按鈕，最多四個
+                if event.message.text == "哈囉":
+                     line_bot_api.reply_message(  # 回復傳入的訊息文字
                         event.reply_token,
-                        TextSendMessage("馬上使用 iDrinkSpot吧!!! \n請傳送位置資訊~~~")
+                        TemplateSendMessage(
+                            alt_text='Buttons template',
+                            template=ButtonsTemplate(
+                                title='Menu',
+                                text='請選擇地區',
+                                actions=[
+                                    MessageTemplateAction(
+                                        label='台北市',
+                                        text='台北市'
+                                    ),
+                                    MessageTemplateAction(
+                                        label='台中市',
+                                        text='台中市'
+                                    )
+                                ]
+                            )
+                        )
                     )
-                
-                # 如果傳入的是位置訊息
-                elif event.message.type == 'location':
 
-                    # user的經緯度
-                    user_latitude = event.message.latitude #緯度 24.多
-                    user_longitude = event.message.longitude  #精度 121.多
-                    
-                    '''
-                    line_bot_api.reply_message(
-                        event.reply_token,
-                        TextSendMessage(text=f"你傳送了位置資訊--> {user_latitude}, {user_longitude}")
-                    )
-                    '''
-                    # shop_names = iDrink.get_shop_names() #可得到店名的結果。資料型態是list。
-
-                    drinkShop = iDrink() #可得到爬蟲經緯度的結果。資料型態是coordinates。程式在scraper.py
-                    # print("drinkShop ", drinkShop.scrape(), "\n user_latitude: ", user_latitude, " user_longitude: ", user_longitude) #檢查drinkShop是否有得到web的經緯度                   
-                    distance = []
-                    for shopname, branchshop, ll, nn in drinkShop.scrape():
-                        ShopName = shopname
-                        BRANCH_SHOP = branchshop
-                        lat_try = ll
-                        lon_try = nn
-
-                        # 計算所有距離，存入distance[]
-                        distance.append((haversine(user_latitude, user_longitude, lat_try, lon_try), BRANCH_SHOP, ShopName))
-                        #print("d: ", haversine(user_latitude, user_longitude, lat_try, lon_try), "shop name: ", shopname) #檢查haversine是否有得到距離
-                       
-                    distance.sort() #距離由小到大排序
-                    
-                    content=""
-                    #查看前8筆距離短的資料，如果距離小於1公里，就回傳。如果有回傳一筆就跳出回圈。
-                    for i in range (0, 8):
-                        if distance[i][0] < 1:
-                            print("店名: ", distance[i][2], " / 分店: ", distance[i][1], " / 距離: ", distance[i][0])
-                            
-                            # content += f"店名: {distance[i][2]}, 分店名: {distance[i][1]}, 距離: {distance[i][0]}"
-                    '''
-                    line_bot_api.reply_message(
-                        event.reply_token,
-                        TextSendMessage(text=content)
-                    )
-                    '''
-                            
-                        
-                        
-        return HttpResponse()
-        
-    else:
-        return HttpResponseBadRequest()
-    
-
-
-# 計算兩點間的距離
-def haversine(lat1, long1, lat2, long2):
-    R = 6371  # 地球半徑(公里)
-    def rad(x):
-        return x * math.pi / 180
-
-    dLat = rad(lat2 - lat1)
-    dLong = rad(long2 - long1)
-
-    a = math.sin(dLat / 2) * math.sin(dLat / 2) + \
-        math.cos(rad(lat1)) * math.cos(rad(lat2)) * \
-        math.sin(dLong / 2) * math.sin(dLong / 2)
-
-    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
-
-    d = R * c
-
-    return d
+'''
