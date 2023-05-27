@@ -11,10 +11,6 @@ from linebot.models import (MessageEvent, TextSendMessage, TemplateSendMessage,
      ButtonsTemplate, MessageTemplateAction, CarouselTemplate, CarouselColumn, MessageAction,
     PostbackAction, URIAction, LocationMessage, TextComponent, BoxComponent, BubbleContainer, FlexSendMessage,
 )
-from numpy import var
-
-
-#from flask import abort
 
 # from .scraper import IFoodie
 from .scraper import iDrink
@@ -24,20 +20,7 @@ from .scraper import iDrink
 line_bot_api = LineBotApi(settings.LINE_CHANNEL_ACCESS_TOKEN) 
 parser = WebhookParser(settings.LINE_CHANNEL_SECRET)
 
-
 handler = WebhookHandler(settings.LINE_CHANNEL_SECRET)
-
-'''
-# 建立經緯度列表_test
-coordinates = [
-    (24.943134055011537, 121.3724875281764), #comebuy
-    (24.942855244813064, 121.37269469336194), #milkshop
-    (24.94226154270322, 121.37267765958076), #wootea
-    (24.94378253440997, 121.37416293381938), #coco
-    (24.937186, 121.367094), #truedan
-    (24.942898036215105, 121.37372763003792) #machu
-]
-'''
 
 
 @csrf_exempt
@@ -114,7 +97,7 @@ def callback(request):
                     if text == "我想喝飲料❗❗❗":
                         line_bot_api.reply_message(
                             event.reply_token,
-                            TextSendMessage(text="請傳送位置資訊")
+                            TextSendMessage(text="歡迎使用iDrinkSpot!!! \n請傳送位置資訊~~~")
                         )
                     
                     elif text == "哈囉":
@@ -183,31 +166,38 @@ def callback(request):
                         TextSendMessage(text=f"你傳送了位置資訊--> {user_latitude}, {user_longitude}")
                     )
                     '''
-                    shop_names = iDrink.get_shop_names() #可得到店名的結果。資料型態是list。
+                    # shop_names = iDrink.get_shop_names() #可得到店名的結果。資料型態是list。
 
                     drinkShop = iDrink() #可得到爬蟲經緯度的結果。資料型態是coordinates。程式在scraper.py
                     # print("drinkShop ", drinkShop.scrape(), "\n user_latitude: ", user_latitude, " user_longitude: ", user_longitude) #檢查drinkShop是否有得到web的經緯度                   
                     distance = []
-                    for shop, ll, nn in drinkShop.scrape():
-                        shopname=shop
+                    for shopname, branchshop, ll, nn in drinkShop.scrape():
+                        ShopName = shopname
+                        BRANCH_SHOP = branchshop
                         lat_try = ll
                         lon_try = nn
 
                         # 計算所有距離，存入distance[]
-                        distance.append((haversine(user_latitude, user_longitude, lat_try, lon_try), shopname))
+                        distance.append((haversine(user_latitude, user_longitude, lat_try, lon_try), BRANCH_SHOP, ShopName))
                         #print("d: ", haversine(user_latitude, user_longitude, lat_try, lon_try), "shop name: ", shopname) #檢查haversine是否有得到距離
                        
                     distance.sort() #距離由小到大排序
                     
-                    #查看前五筆距離短的資料，如果距離小於1公里，就回傳。如果有回傳一筆就跳出回圈。
-                    for i in range (0, 5):
+                    content=""
+                    #查看前8筆距離短的資料，如果距離小於1公里，就回傳。如果有回傳一筆就跳出回圈。
+                    for i in range (0, 8):
                         if distance[i][0] < 1:
-                            print("店名: ", distance[i][1], "距離: ", distance[i][0])
-                            line_bot_api.reply_message(
-                                event.reply_token,
-                                TextSendMessage(text=f"分店名: {distance[i][1]}, \n距離: {distance[i][0]}, \n店名: {shop_names}")
-                            )
-                        break
+                            print("店名: ", distance[i][2], " / 分店: ", distance[i][1], " / 距離: ", distance[i][0])
+                            
+                            # content += f"店名: {distance[i][2]}, 分店名: {distance[i][1]}, 距離: {distance[i][0]}"
+                    '''
+                    line_bot_api.reply_message(
+                        event.reply_token,
+                        TextSendMessage(text=content)
+                    )
+                    '''
+                            
+                        
                         
         return HttpResponse()
         

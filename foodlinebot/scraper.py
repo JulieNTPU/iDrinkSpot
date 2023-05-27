@@ -1,7 +1,6 @@
 from bs4 import BeautifulSoup
 from abc import ABC, abstractmethod
 import requests
-import soupsieve
 
 
 shop_names = []
@@ -14,7 +13,8 @@ shop_names.append("可不可熟成紅茶")
 print("111113:", shop_names)
 
 # 發送 HTTP GET 請求獲取網頁內容
-url = 'https://julientpu.github.io/coco都可-分店'
+# url = 'https://julientpu.github.io/coco都可-分店'
+url = 'https://jiatongoo.github.io/alldrinks.html'
 
 # 飲料抽象類別
 class Drink(ABC):
@@ -40,10 +40,12 @@ class iDrink(Drink):
 
         # 找到tr標籤內，包含經緯度資料的元素。分別存入coordinates list中。
         for card in cards:
-            BRANCH_SHOP = card.find('td', {"class": "shop"}).getText()
+            SHOP = card.find('td', {"class": "ShopName"}).getText() #店名
+            BRANCH_SHOP = card.find('td', {"class": "shop"}).getText() #分店
             LAT = card.find('td', {"class": "lat"}).text  
             LON = card.find('td', {"class": "lon"}).text
-            coordinates.append((BRANCH_SHOP, float(LAT), float(LON)))
+
+            coordinates.append((SHOP, BRANCH_SHOP, float(LAT), float(LON)))
         return coordinates
     
     def get_shop_names(): # 取得店名
