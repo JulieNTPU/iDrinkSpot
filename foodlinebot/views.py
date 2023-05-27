@@ -98,6 +98,7 @@ def callback(request):
                         #print("d: ", haversine(user_latitude, user_longitude, lat_try, lon_try), "shop name: ", shopname) #檢查haversine是否有得到距離
                        
                     distance.sort() #距離由小到大排序
+                    count=0 #用來看有沒有距離小於1公里的店家
                                         
                     #查看前8筆距離短的資料，如果距離小於1公里，就回傳。如果有回傳一筆就跳出回圈。
                     for i in range (0, 5):
@@ -113,6 +114,7 @@ def callback(request):
                                 'url': google_maps_link
                                 }
                             )
+                            count+=1
 
                         else:
                             print("Sorry~ 方圓一公里內沒有飲料店喔")
@@ -123,13 +125,14 @@ def callback(request):
                             break
                             
                     print("drinkShop_options: ", drinkShop_options)
-                    menu = send_menu()
-                    
-                    # 发送回复消息
-                    line_bot_api.reply_message(
-                        event.reply_token,
-                        menu
-                    )
+                    if count > 0:
+                        #右滑式選單
+                        menu = send_menu()
+                        line_bot_api.reply_message(
+                            event.reply_token,
+                            menu
+                        )
+                        count=0
                     
                             
                         
