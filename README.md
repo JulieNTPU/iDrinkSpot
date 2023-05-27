@@ -73,6 +73,9 @@ https://steam.oxxostudio.tw/category/python/example/line-template-message.html#a
 1. 使用 drinkShop.scrape() 爬飲料店分店的經緯度資料
 2. 用 haversine() function 計算使用者與飲料店分店的距離
 
+# 地址導入google map
+1. 使用generate_google_maps_link()，在views.py裡面。
+
 # 未完成
 1. 自動爬不同的URL (目前寫死)
 2. 根據shop_name做飲料選單
