@@ -78,13 +78,13 @@ https://steam.oxxostudio.tw/category/python/example/line-template-message.html#a
 
 # URL
 飲料品項的連結:
-1.CoCo都可: https://jiatongoo.github.io/coco.html
+1.CoCo都可: https://jiatongoo.github.io/CoCo%E9%83%BD%E5%8F%AF.html
 2.珍煮丹: https://jiatongoo.github.io/%E7%8F%8D%E7%85%AE%E4%B8%B9.html
 3.迷客夏: https://jiatongoo.github.io/%E8%BF%B7%E5%AE%A2%E5%A4%8F.html
 4.可不可熟成紅茶: https://jiatongoo.github.io/%E5%8F%AF%E4%B8%8D%E5%8F%AF%E7%86%9F%E6%88%90%E7%B4%85%E8%8C%B6.html
 5.麻古茶坊: https://jiatongoo.github.io/%E9%BA%BB%E5%8F%A4%E8%8C%B6%E5%9D%8A.html
-6.五桐號: https://jiatongoo.github.io/%E4%BA%94%E6%A1%90%E8%99%9F.html
-7.comebuy: https://jiatongoo.github.io/comebuy
+6.五桐號WooTEA: https://jiatongoo.github.io/%E4%BA%94%E6%A1%90%E8%99%9FWooTEA.html
+7.COMEBUY: https://jiatongoo.github.io/COMEBUY.html
 8.清心福全: https://jiatongoo.github.io/%E6%B8%85%E5%BF%83%E7%A6%8F%E5%85%A8
 
 
