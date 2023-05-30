@@ -149,15 +149,16 @@ def send_menu():
         column = CarouselColumn(
             title = option['ShopName'],
             text = option['BRANCH_SHOP'],
-            actions = [
+            actions = [ #action最多只能添加三個
                 MessageAction(
-                label = '點我看菜單',
-                text = '點我看菜單'
+                label = '點我看菜單', #顯示在按鈕上的文字
+                text = option['ShopName'] #顯示在聊天室的文字
                 ),
                 URIAction(
                     label = 'Google Map',
                     uri = option['url']
                 )
+
             ]
         )
         columns.append(column)

@@ -40,6 +40,11 @@ class iDrink(Drink):
             coordinates.append((SHOP, BRANCH_SHOP, Addr, float(LAT), float(LON)))
         return coordinates
     
+    def get_menu(self): # 取得飲料店菜單
+        # 解析HTML內容
+        response = requests.get(url_allshop)        
+        soup = BeautifulSoup(response.text, 'html.parser')
+    
  
 
 '''
