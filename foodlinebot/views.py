@@ -14,7 +14,7 @@ from linebot.models import (MessageEvent, TextSendMessage, TemplateSendMessage,
 )
 
 # from .scraper import IFoodie
-from .scraper import iDrink
+from .scraper import iDrink, iMenu
 
 
 # 取得settings.py中的LINE Bot憑證來進行Messaging API的驗證
@@ -23,7 +23,25 @@ parser = WebhookParser(settings.LINE_CHANNEL_SECRET)
 handler = WebhookHandler(settings.LINE_CHANNEL_SECRET)
 
 
-drinkShop_options = [] # 存距離短的`店名`的list
+drinkShop_options = [] # 存距離短的店名`的list
+
+
+
+drink_category =[] #特定飲料店的菜單
+Shop_name = ["CoCo都可", "珍煮丹", "迷客夏", "可不可熟成紅茶", "麻古茶坊", "五桐號WooTEA", "COMEBUY", "清心福全"]
+
+def get_drink_category(t):
+    aa = iMenu(t)
+    for type, item, price, kcal in aa.scrape():
+        TYPE = type
+        ITEM = item
+        PRICE = price
+        KCAL = kcal
+        drink_category.append((t,TYPE, ITEM, PRICE, KCAL))
+    array_text = '\n'.join([', '.join(item) for item in drink_category])
+    return array_text
+
+
 
 
 
@@ -66,6 +84,15 @@ def callback(request):
                             event.reply_token,
                             TextSendMessage(text="歡迎使用iDrinkSpot!!! \n請傳送位置資訊~~~")
                         )
+
+                    elif text == "CoCo都可":
+                        category = get_drink_category(text)
+                        
+                        line_bot_api.reply_message(
+                            event.reply_token,
+                            TextSendMessage(text = category)
+                        )
+
                     else:
                         line_bot_api.reply_message(  # 輸入其他文字時，回復傳入的訊息文字
                         event.reply_token,
@@ -126,13 +153,14 @@ def callback(request):
                             
                     print("drinkShop_options: ", drinkShop_options)
                     if count > 0:
-                        #右滑式選單
-                        menu = send_menu()
+                        #右滑式選單，顯示飲料店選單
+                        near_shop = send_near_shop()
                         line_bot_api.reply_message(
                             event.reply_token,
-                            menu
+                            near_shop
                         )
                         count=0
+
                     
                             
                         
@@ -141,9 +169,13 @@ def callback(request):
         
     else:
         return HttpResponseBadRequest()
-    
 
-def send_menu():
+
+# 傳送單一飲料店菜單(大項目)
+
+
+# 傳送user附近的飲料店
+def send_near_shop():
     columns=[]
     for option in drinkShop_options:
         column = CarouselColumn(
@@ -158,7 +190,6 @@ def send_menu():
                     label = 'Google Map',
                     uri = option['url']
                 )
-
             ]
         )
         columns.append(column)

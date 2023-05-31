@@ -4,20 +4,23 @@ import requests
 
 
 # 發送 HTTP GET 請求獲取網頁內容
-# url = 'https://julientpu.github.io/coco都可-分店'
-url_allshop = 'https://jiatongoo.github.io/alldrinks.html'
+url_allshop = 'https://jiatongoo.github.io/alldrinks.html' # 飲料店
+
+
 
 # 飲料抽象類別
 class Drink(ABC):
  
-    #def __init__(self, area):
-        #self.area = area  # 地區
+    #def __init__(self, menu):
+        #self.menu = menu  # 地區
  
     @abstractmethod
     def scrape(self):  #抽象方法(abstractmethod)就是共同的介面，未來新增的美食網頁爬蟲，就可以依據各自的邏輯來實作這個介面。
         pass
 
-# 飲料地圖爬蟲
+
+
+# 飲料店爬蟲
 class iDrink(Drink):
     
     def scrape(self): # 取得經緯度
@@ -40,10 +43,38 @@ class iDrink(Drink):
             coordinates.append((SHOP, BRANCH_SHOP, Addr, float(LAT), float(LON)))
         return coordinates
     
-    def get_menu(self): # 取得飲料店菜單
+    
+
+# 菜單抽象類別
+class Menu(ABC):
+ 
+    def __init__(self, area):
+        self.area = area  # 地區
+ 
+    @abstractmethod
+    def scrape(self):
+        pass
+
+class iMenu(Menu):
+    def scrape(self):
         # 解析HTML內容
-        response = requests.get(url_allshop)        
+        response = requests.get("https://jiatongoo.github.io/" + self.area + ".html")        
         soup = BeautifulSoup(response.text, 'html.parser')
+
+        coordinates = []
+        cards = soup.find_all('tr', {"class": "data"})
+
+        for card in cards:
+            TYPE = card.find('td', {"class": "type"}).getText() #飲料類別
+            ITEM = card.find('td', {"class": "item"}).getText() #飲料名稱
+            PRICE = card.find('td', {"class": "price"}).getText() #價格
+            KCAL = card.find('td', {"class": "kcal"}).getText() #卡路里
+
+            coordinates.append((TYPE, ITEM, PRICE, KCAL))
+        return coordinates
+
+
+
     
  
 
