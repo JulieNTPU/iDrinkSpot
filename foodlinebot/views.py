@@ -23,23 +23,86 @@ parser = WebhookParser(settings.LINE_CHANNEL_SECRET)
 handler = WebhookHandler(settings.LINE_CHANNEL_SECRET)
 
 
-drinkShop_options = [] # 存距離短的店名`的list
+drinkShop_options = [] # 存距離短的店名的list
+drink_category =[] #特定飲料店的菜單 (第一列是店名)
 
-
-
-drink_category =[] #特定飲料店的菜單
 Shop_name = ["CoCo都可", "珍煮丹", "迷客夏", "可不可熟成紅茶", "麻古茶坊", "五桐號WooTEA", "COMEBUY", "清心福全"]
 
+# 特定飲料店的菜單
 def get_drink_category(t):
     aa = iMenu(t)
+    category =[]
+    # drink_category =[] #特定飲料店的菜單 (第一列是店名)
     for type, item, price, kcal in aa.scrape():
         TYPE = type
         ITEM = item
         PRICE = price
         KCAL = kcal
-        drink_category.append((t,TYPE, ITEM, PRICE, KCAL))
-    array_text = '\n'.join([', '.join(item) for item in drink_category])
-    return array_text
+        category.append((t,TYPE, ITEM, PRICE, KCAL))
+    for i in range(0, len(category)):
+        drink_category.append({
+            'shop': category[i][0],
+            'type': category[i][1],
+            'item': category[i][2],
+            'price': category[i][3],
+            'kcal': category[i][4]
+        })
+    return drink_category
+    
+
+# 傳送特定飲料店的大種類 (不重複)
+def send_category_of_menu(category):
+    columns=[]
+    unique_types = get_unique_types(category)
+    shop = drink_category[0]['shop']
+
+    for option in unique_types:
+        
+        column = CarouselColumn(
+            title = option['type'],
+            text = "Try it!",
+            actions = [ #action最多只能添加三個
+                MessageAction(
+                label = '點我看'+option['type'], #顯示在按鈕上的文字
+                text = shop + " " + option['type'] #顯示在聊天室的文字
+                )
+            ]
+        )
+        columns.append(column)
+        # 创建 CarouselTemplate，并指定 columns 参数为上述列表
+        carousel_template = CarouselTemplate(columns=columns)
+                        
+        # 使用上述 CarouselTemplate 创建 TemplateSendMessage
+        template_message = TemplateSendMessage(
+            alt_text='CarouselTemplate',
+            template=carousel_template
+        )
+    return template_message
+
+#列印不重複的飲料類別
+def get_unique_types(category):
+    unique_types = []
+    printed_types = set()
+
+    for item in category:
+        drink_type = item['type']
+        if drink_type not in printed_types:
+            unique_types.append({
+                'type': drink_type
+                })
+            printed_types.add(drink_type)
+
+    return unique_types
+
+'''
+#判斷回傳的文字是否在[]中 
+def check_text_in_list(text, drink_category):
+    if text in drink_category:
+        return True
+    else:
+        return False
+'''
+
 
 
 
@@ -79,18 +142,20 @@ def callback(request):
                     
                     print("5555555 :", drinkShop_options)
 
+                    
                     if text == "我想喝飲料❗❗❗":
                         line_bot_api.reply_message(
                             event.reply_token,
                             TextSendMessage(text="歡迎使用iDrinkSpot!!! \n請傳送位置資訊~~~")
                         )
+                    
 
                     elif text == "CoCo都可":
                         category = get_drink_category(text)
-                        
+                        #顯示種類的選單
                         line_bot_api.reply_message(
                             event.reply_token,
-                            TextSendMessage(text = category)
+                            send_category_of_menu(category)
                         )
 
                     else:
@@ -98,7 +163,14 @@ def callback(request):
                         event.reply_token,
                         TextSendMessage("馬上使用 iDrinkSpot 吧!!! \n請傳送位置資訊~~~")
                     )
-                
+                    '''
+                    elif check_text_in_list(text, category):
+                        line_bot_api.reply_message(
+                            event.reply_token,
+                            TextSendMessage(text="請稍等，正在為您查詢中...")
+                        )
+                    '''
+
                 # 如果傳入的是位置訊息
                 elif event.message.type == 'location':
 
