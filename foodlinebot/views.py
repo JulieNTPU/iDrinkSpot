@@ -28,11 +28,11 @@ drink_category =[] #特定飲料店的菜單 (第一列是店名)
 
 Shop_name = ["CoCo都可", "珍煮丹", "迷客夏", "可不可熟成紅茶", "麻古茶坊", "五桐號WooTEA", "COMEBUY", "清心福全"]
 
-# 特定飲料店的菜單
+# 特定飲料店的菜單，t為使用者的輸入
 def get_drink_category(t):
-    aa = iMenu(t)
+    aa = iMenu(t) #爬蟲
     category =[]
-    # drink_category =[] #特定飲料店的菜單 (第一列是店名)
+
     for type, item, price, kcal in aa.scrape():
         TYPE = type
         ITEM = item
@@ -63,8 +63,8 @@ def send_category_of_menu(category):
             text = "Try it!",
             actions = [ #action最多只能添加三個
                 MessageAction(
-                label = '點我看'+option['type'], #顯示在按鈕上的文字
-                text = shop + " " + option['type'] #顯示在聊天室的文字
+                label = '點我看 '+option['type'], #顯示在按鈕上的文字
+                text = shop + ", " + option['type'] #顯示在聊天室的文字
                 )
             ]
         )
@@ -151,11 +151,62 @@ def callback(request):
                     
 
                     elif text == "CoCo都可":
-                        category = get_drink_category(text)
+                        drink_category.clear()
+                        category = get_drink_category(text) # 傳送飲料店名稱，得到大項目
                         #顯示種類的選單
                         line_bot_api.reply_message(
                             event.reply_token,
-                            send_category_of_menu(category)
+                            send_category_of_menu(category) # 輸入大項目，顯示不重複的飲料type
+                        )
+                    
+                    elif text == "COMEBUY":
+                        drink_category.clear()
+                        category = get_drink_category(text) # 傳送飲料店名稱，得到大項目
+                        #顯示種類的選單
+                        line_bot_api.reply_message(
+                            event.reply_token,
+                            send_category_of_menu(category) # 輸入大項目，顯示不重複的飲料type
+                        )
+                
+                    elif text == "珍煮丹":
+                        drink_category.clear()
+                        category = get_drink_category(text) # 傳送飲料店名稱，得到大項目
+                        #顯示種類的選單
+                        line_bot_api.reply_message(
+                            event.reply_token,
+                            send_category_of_menu(category) # 輸入大項目，顯示不重複的飲料type
+                        )
+                    elif text == "迷客夏":
+                        drink_category.clear()
+                        category = get_drink_category(text) # 傳送飲料店名稱，得到大項目
+                        #顯示種類的選單
+                        line_bot_api.reply_message(
+                            event.reply_token,
+                            send_category_of_menu(category) # 輸入大項目，顯示不重複的飲料type
+                        )
+                    elif text == "可不可熟成紅茶":
+                        drink_category.clear()
+                        category = get_drink_category(text) # 傳送飲料店名稱，得到大項目
+                        #顯示種類的選單
+                        line_bot_api.reply_message(
+                            event.reply_token,
+                            send_category_of_menu(category) # 輸入大項目，顯示不重複的飲料type
+                        )
+                    elif text == "麻古茶坊":
+                        drink_category.clear()
+                        category = get_drink_category(text) # 傳送飲料店名稱，得到大項目
+                        #顯示種類的選單
+                        line_bot_api.reply_message(
+                            event.reply_token,
+                            send_category_of_menu(category) # 輸入大項目，顯示不重複的飲料type
+                        )
+                    elif text == "五桐號WooTEA":
+                        drink_category.clear()
+                        category = get_drink_category(text) # 傳送飲料店名稱，得到大項目
+                        #顯示種類的選單
+                        line_bot_api.reply_message(
+                            event.reply_token,
+                            send_category_of_menu(category) # 輸入大項目，顯示不重複的飲料type
                         )
 
                     else:
@@ -243,7 +294,7 @@ def callback(request):
         return HttpResponseBadRequest()
 
 
-# 傳送單一飲料店菜單(大項目)
+
 
 
 # 傳送user附近的飲料店
