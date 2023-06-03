@@ -60,7 +60,7 @@ def send_category_of_menu(category):
         
         column = CarouselColumn(
             title = option['type'],
-            text = "Try it!",
+            text = shop + "   Try it!!",
             actions = [ #action最多只能添加三個
                 MessageAction(
                 label = '點我看 '+option['type'], #顯示在按鈕上的文字
@@ -140,87 +140,29 @@ def callback(request):
                 if event.message.type == 'text':
                     text = event.message.text
                     
-                    print("5555555 :", drinkShop_options)
+                    #print("5555555 :", drinkShop_options)
 
-                    
                     if text == "我想喝飲料❗❗❗":
                         line_bot_api.reply_message(
                             event.reply_token,
                             TextSendMessage(text="歡迎使用iDrinkSpot!!! \n請傳送位置資訊~~~")
                         )
-                    
 
-                    elif text == "CoCo都可":
+                    elif text in Shop_name:
                         drink_category.clear()
                         category = get_drink_category(text) # 傳送飲料店名稱，得到大項目
-                        #顯示種類的選單
-                        line_bot_api.reply_message(
-                            event.reply_token,
-                            send_category_of_menu(category) # 輸入大項目，顯示不重複的飲料type
-                        )
-                    
-                    elif text == "COMEBUY":
-                        drink_category.clear()
-                        category = get_drink_category(text) # 傳送飲料店名稱，得到大項目
-                        #顯示種類的選單
-                        line_bot_api.reply_message(
-                            event.reply_token,
-                            send_category_of_menu(category) # 輸入大項目，顯示不重複的飲料type
-                        )
-                
-                    elif text == "珍煮丹":
-                        drink_category.clear()
-                        category = get_drink_category(text) # 傳送飲料店名稱，得到大項目
-                        #顯示種類的選單
-                        line_bot_api.reply_message(
-                            event.reply_token,
-                            send_category_of_menu(category) # 輸入大項目，顯示不重複的飲料type
-                        )
-                    elif text == "迷客夏":
-                        drink_category.clear()
-                        category = get_drink_category(text) # 傳送飲料店名稱，得到大項目
-                        #顯示種類的選單
-                        line_bot_api.reply_message(
-                            event.reply_token,
-                            send_category_of_menu(category) # 輸入大項目，顯示不重複的飲料type
-                        )
-                    elif text == "可不可熟成紅茶":
-                        drink_category.clear()
-                        category = get_drink_category(text) # 傳送飲料店名稱，得到大項目
-                        #顯示種類的選單
-                        line_bot_api.reply_message(
-                            event.reply_token,
-                            send_category_of_menu(category) # 輸入大項目，顯示不重複的飲料type
-                        )
-                    elif text == "麻古茶坊":
-                        drink_category.clear()
-                        category = get_drink_category(text) # 傳送飲料店名稱，得到大項目
-                        #顯示種類的選單
-                        line_bot_api.reply_message(
-                            event.reply_token,
-                            send_category_of_menu(category) # 輸入大項目，顯示不重複的飲料type
-                        )
-                    elif text == "五桐號WooTEA":
-                        drink_category.clear()
-                        category = get_drink_category(text) # 傳送飲料店名稱，得到大項目
-                        #顯示種類的選單
-                        line_bot_api.reply_message(
-                            event.reply_token,
-                            send_category_of_menu(category) # 輸入大項目，顯示不重複的飲料type
-                        )
 
+                        #顯示種類的選單
+                        line_bot_api.reply_message(
+                            event.reply_token,
+                            send_category_of_menu(category)# 輸入大項目，顯示不重複的飲料type
+                        )
                     else:
                         line_bot_api.reply_message(  # 輸入其他文字時，回復傳入的訊息文字
                         event.reply_token,
                         TextSendMessage("馬上使用 iDrinkSpot 吧!!! \n請傳送位置資訊~~~")
                     )
-                    '''
-                    elif check_text_in_list(text, category):
-                        line_bot_api.reply_message(
-                            event.reply_token,
-                            TextSendMessage(text="請稍等，正在為您查詢中...")
-                        )
-                    '''
+                    
 
                 # 如果傳入的是位置訊息
                 elif event.message.type == 'location':
