@@ -55,7 +55,7 @@ class Menu(ABC):
     def scrape(self):
         pass
 
-class iMenu(Menu):
+class iMenu(Menu):  #爬飲料店的菜單
     def scrape(self):
         # 解析HTML內容
         response = requests.get("https://jiatongoo.github.io/" + self.area + ".html")        

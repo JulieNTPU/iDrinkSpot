@@ -28,6 +28,45 @@ drink_category =[] #特定飲料店的菜單 (第一列是店名)
 
 Shop_name = ["CoCo都可", "珍煮丹", "迷客夏", "可不可熟成紅茶", "麻古茶坊", "五桐號WooTEA", "COMEBUY", "清心福全"]
 
+
+#讀取飲料細項
+def get_drink_item(split_text):
+
+    aa = iMenu(split_text[0]) #爬指定飲料店的菜單
+    category =[]
+
+    for type, item, price, kcal in aa.scrape():
+        TYPE = type
+        ITEM = item
+        PRICE = price
+        KCAL = kcal
+        category.append((TYPE, ITEM, PRICE, KCAL))
+    new_category = [] 
+    for i in range(0, len(category)):
+        new_category.append({
+            #'shop': category[i][0],
+            'type': category[i][0],
+            'item': category[i][1],
+            'price': category[i][2],
+            'kcal': category[i][3]
+        })
+
+    output_str = split_text[0] + "的" + split_text[1] + "有:"
+    count=1
+    for i in range(0, len(category)):
+        if split_text[1] == new_category[i]['type']:
+            print("shop: ", split_text[0], "type: ", new_category[i]['type'], "item: ", new_category[i]['item'], "price: ", new_category[i]['price'], "kcal: ", new_category[i]['kcal'])
+            #output_str += split_text[0], drink_category[i]['type'], drink_category[i]['item'], drink_category[i]['price'], drink_category[i]['kcal']
+            output_str += ' '.join(["\n", str(count), ".", new_category[i]['item'], " /$", new_category[i]['price'], "/", new_category[i]['kcal'], "kcal"])
+
+            count+=1
+
+        #else:
+        #    print("查無品項")
+    return output_str
+    
+
+
 # 特定飲料店的菜單，t為使用者的輸入
 def get_drink_category(t):
     aa = iMenu(t) #爬蟲
@@ -79,33 +118,6 @@ def send_category_of_menu(category):
         )
     return template_message
 
-#列印不重複的飲料類別
-def get_unique_types(category):
-    unique_types = []
-    printed_types = set()
-
-    for item in category:
-        drink_type = item['type']
-        if drink_type not in printed_types:
-            unique_types.append({
-                'type': drink_type
-                })
-            printed_types.add(drink_type)
-
-    return unique_types
-
-'''
-#判斷回傳的文字是否在[]中 
-def check_text_in_list(text, drink_category):
-    if text in drink_category:
-        return True
-    else:
-        return False
-'''
-
-
-
-
 
 
 @csrf_exempt
@@ -139,8 +151,7 @@ def callback(request):
                 # 如果傳入的是文字訊息
                 if event.message.type == 'text':
                     text = event.message.text
-                    
-                    #print("5555555 :", drinkShop_options)
+
 
                     if text == "我想喝飲料❗❗❗":
                         line_bot_api.reply_message(
@@ -148,7 +159,7 @@ def callback(request):
                             TextSendMessage(text="歡迎使用iDrinkSpot!!! \n請傳送位置資訊~~~")
                         )
 
-                    elif text in Shop_name:
+                    elif text in Shop_name:  # 如果輸入的是店名
                         drink_category.clear()
                         category = get_drink_category(text) # 傳送飲料店名稱，得到大項目
 
@@ -158,10 +169,24 @@ def callback(request):
                             send_category_of_menu(category)# 輸入大項目，顯示不重複的飲料type
                         )
                     else:
+                        sp_text= text.split(", ") #拆解字串，如果有逗號，就分開
+
+                        if sp_text[0] in Shop_name:
+                            output_text = get_drink_item(sp_text)
+                            #print("output_text: ", output_text)
+                            #print(drink_category)
+
+                        else:
+                            output_text = "請按照步驟重新輸入位置資訊，我們會幫你找附近的飲料店喔~~"
+                        
                         line_bot_api.reply_message(  # 輸入其他文字時，回復傳入的訊息文字
-                        event.reply_token,
-                        TextSendMessage("馬上使用 iDrinkSpot 吧!!! \n請傳送位置資訊~~~")
-                    )
+                            event.reply_token,
+                            TextSendMessage(text = output_text)
+                        )
+                        
+                        print("sp_text: ", sp_text[0])
+                        #print(drink_category)
+
                     
 
                 # 如果傳入的是位置訊息
@@ -171,7 +196,6 @@ def callback(request):
                     user_latitude = event.message.latitude #緯度 24.多
                     user_longitude = event.message.longitude  #精度 121.多
                     
-
                     drinkShop = iDrink() #可得到爬蟲經緯度的結果。資料型態是coordinates。程式在scraper.py
                     # print("drinkShop ", drinkShop.scrape(), "\n user_latitude: ", user_latitude, " user_longitude: ", user_longitude) #檢查drinkShop是否有得到web的經緯度                   
                     
@@ -268,6 +292,22 @@ def send_near_shop():
         )
     return template_message
 
+
+#列印不重複的飲料類別
+def get_unique_types(category):
+    unique_types = []
+    printed_types = set()
+
+    for item in category:
+        drink_type = item['type']
+        if drink_type not in printed_types:
+            unique_types.append({
+                'type': drink_type
+                })
+            printed_types.add(drink_type)
+
+    return unique_types
+
         
 
 
@@ -301,79 +341,3 @@ def haversine(lat1, long1, lat2, long2):
 
     return d
 
-
-''' 滑軌選單模板
-line_bot_api.reply_message(  #linebot 回傳 CarouselTemplate 最多十個
-                            event.reply_token,
-                            TemplateSendMessage(    
-                                alt_text='CarouselTemplate',
-                                template=CarouselTemplate(
-                                    columns=[
-                                        CarouselColumn(
-                                            title='茶湯會',
-                                            text='solgan',
-                                            actions=[
-                                                    PostbackAction(
-                                                    label='postback',
-                                                    data='data1'
-                                                ),
-                                                MessageAction(
-                                                label='茶湯會',
-                                                text='茶湯會'
-                                                ),
-                                                URIAction(
-                                                label='點我進入茶湯會官網',
-                                                uri='https://tw.tp-tea.com/'
-                                                )
-                                            ]
-                                        ),
-                                        CarouselColumn(
-                                            title='50嵐',
-                                            text='solgan',
-                                            actions=[
-                                                PostbackAction(
-                                                label='postback',
-                                                data='data1'
-                                                ),
-                                                MessageAction(
-                                                    label='50嵐',
-                                                    text='50嵐'
-                                                ),
-                                                URIAction(
-                                                    label='點我進入50嵐官網',
-                                                    uri='http://50lan.com/web/news.asp'
-                                                )
-                                            ]
-                                        )
-                                    ]
-                                )
-                            )
-                        )
-'''
-
-
-''' 四個選擇 模板
-                #linebot 回傳按鈕，最多四個
-                if event.message.text == "哈囉":
-                     line_bot_api.reply_message(  # 回復傳入的訊息文字
-                        event.reply_token,
-                        TemplateSendMessage(
-                            alt_text='Buttons template',
-                            template=ButtonsTemplate(
-                                title='Menu',
-                                text='請選擇地區',
-                                actions=[
-                                    MessageTemplateAction(
-                                        label='台北市',
-                                        text='台北市'
-                                    ),
-                                    MessageTemplateAction(
-                                        label='台中市',
-                                        text='台中市'
-                                    )
-                                ]
-                            )
-                        )
-                    )
-
-'''
